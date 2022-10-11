@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.4</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <modules>
+        <module>LogNoiseLess-core</module>
+    </modules>
+
+    <groupId>com.muyuanjin</groupId>
+    <artifactId>LogNoiseLess</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>LogNoiseLess</name>
+    <description>LogNoiseLess</description>
+
+    <properties>
+        <java.version>1.8</java.version>
+        <jetbrains-annotations.version>1.7.0</jetbrains-annotations.version>
+        <cuckoofilter4j.version>1.0.2</cuckoofilter4j.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.realityforge.org.jetbrains.annotations</groupId>
+                <artifactId>org.jetbrains.annotations</artifactId>
+                <version>${jetbrains-annotations.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.mgunlogson</groupId>
+                <artifactId>cuckoofilter4j</artifactId>
+                <version>${cuckoofilter4j.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>

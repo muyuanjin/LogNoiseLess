@@ -1,0 +1,8 @@
+logback:
+  stackTrace:
+    #      skipLine: org.,cn.hutool,javax.
+    #      skipLine: "!line.contains(\"com.example\")"
+    skipLine: com.example
+    skipLineMode: whitelist
+    maxNumPerCycle: 1
+    cycleDuration: 2h

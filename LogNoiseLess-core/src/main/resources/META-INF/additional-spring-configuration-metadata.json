@@ -1,0 +1,30 @@
+{
+  "properties": [
+    {
+      "name": "logback.stackTrace.skipLine",
+      "type": "java.lang.String",
+      "description": "需要忽略的堆栈打印行的包名(多个包以逗号隔开).",
+      "sourceType": "com.muyuanjin.lognoiseless.internal.NoiseLessConfig"
+    },
+    {
+      "name": "logback.stackTrace.skipLineMode",
+      "type": "com.muyuanjin.lognoiseless.internal.SkipLineMode",
+      "description": "跳过堆栈的模式.",
+      "defaultValue": "BLACKLIST",
+      "sourceType": "com.muyuanjin.lognoiseless.internal.NoiseLessConfig"
+    },
+    {
+      "name": "logback.stackTrace.maxNumPerCycle",
+      "type": "java.lang.String",
+      "description": "每个周期最大打印堆栈的数量,为0时每次均进行跳过堆栈判断.",
+      "defaultValue": 0,
+      "sourceType": "com.muyuanjin.lognoiseless.internal.NoiseLessConfig"
+    },
+    {
+      "name": "logback.stackTrace.cycleDuration",
+      "type": "java.time.Duration",
+      "description": "周期时间长度.",
+      "sourceType": "com.muyuanjin.lognoiseless.internal.NoiseLessConfig"
+    }
+  ]
+}

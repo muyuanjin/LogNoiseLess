@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!--  导入spring基础配置  -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+<!--    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>-->
+
+    <!--  替换defaults.xml中定义的属性， 使用自己的噪音抑制异常转换器 -->
+    <conversionRule conversionWord="wEx"
+                    converterClass="com.muyuanjin.lognoiseless.NoiseLessThrowableProxyConverter"/>
+
+    <!-- 控制台日志，因为覆盖了属性，所以这里不能直接借用 console-appender.xml ，copy一遍-->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>${CONSOLE_LOG_CHARSET}</charset>
+        </encoder>
+    </appender>
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>

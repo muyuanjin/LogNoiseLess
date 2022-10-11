@@ -1,0 +1,4 @@
+org.springframework.boot.env.EnvironmentPostProcessor=\
+com.muyuanjin.lognoiseless.util.SpringEnvUtil
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.muyuanjin.lognoiseless.util.SpringUtil
