@@ -25,6 +25,7 @@ public class InstanceUtil {
             try {
                 return ReflectionUtils.accessibleConstructor(key).newInstance();
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                SpringUtil.registerBean(key);
                 return SpringUtil.getBean(key);
             }
         }

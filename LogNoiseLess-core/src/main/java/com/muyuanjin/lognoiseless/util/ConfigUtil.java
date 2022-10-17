@@ -19,7 +19,7 @@ public class ConfigUtil {
     }
 
     /**
-     * 获取配置属性，优先从spring中获取，然后从系统中获取，然后是缺省值，然后是读取缺省值所在的文件
+     * 获取配置属性，优先从spring中获取，然后从系统中获取，然后是缺省值
      *
      * @param propertyKey                 属性键
      * @param defaultValue                缺省值
