@@ -59,7 +59,7 @@ public class NoiseLessConfig {
             }
         }
         if (maxNumPerCycle > 0 && duration != null) {
-            skipPredicate = new CuckooThrowableDuplicateFilter(maxNumPerCycle, duration, skipPredicate);
+            skipPredicate = maxNumPerCycle == 1 ? new BloomThrowableDuplicateFilter(duration, skipPredicate) : new CuckooThrowableDuplicateFilter(maxNumPerCycle, duration, skipPredicate);
         }
         return new NoiseLessConfig(mode, skipPredicate, maxNumPerCycle, duration);
     });

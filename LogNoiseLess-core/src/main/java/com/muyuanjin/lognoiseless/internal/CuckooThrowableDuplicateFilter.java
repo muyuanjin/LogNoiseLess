@@ -6,16 +6,11 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.mgunlogson.cuckoofilter4j.CuckooFilter;
 import com.github.mgunlogson.cuckoofilter4j.Utils;
-import com.google.common.hash.Funnel;
-import com.google.common.hash.PrimitiveSink;
 import com.muyuanjin.lognoiseless.StackLineSkipPredicate;
 import com.muyuanjin.lognoiseless.util.LazyReference;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.util.Assert;
 
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -26,6 +21,7 @@ import java.util.function.Supplier;
  *
  * @author muyuanjin
  */
+@SuppressWarnings({"unused", "UnstableApiUsage"})
 public class CuckooThrowableDuplicateFilter implements StackLineSkipPredicate {
     //因为日志文件会输出到控制台和文件内，会多次调用 isShouldEnableSkip 方法 ，缓存同一对象的判断结果
     private static final LazyReference<Cache<IThrowableProxy, Boolean>> RESULT_CACHE = new LazyReference<>(() -> Caffeine.newBuilder().weakKeys().build());
@@ -50,41 +46,13 @@ public class CuckooThrowableDuplicateFilter implements StackLineSkipPredicate {
 
     @Override
     public boolean isShouldEnableSkip(IThrowableProxy throwableProxy) {
-        //通过堆栈前3行（抛出异常的位置）进行判断是否未记录过，如果 mightContain false 则直接判断为打印完整堆栈（return false）
-        //如果 mightContain true ，则由于 抛出位置≠完整堆栈 & 布谷鸟过滤器的误判，再进行一次完整堆栈的布谷鸟过滤
-        return Boolean.TRUE.equals(RESULT_CACHE.get().get(throwableProxy, k -> {
-            //通过堆栈前3行（抛出异常的位置＋调用）进行判断是否未记录过，如果 mightContain false 则直接判断为打印完整堆栈（return false）
-            StackTraceElementProxy[] traceElementProxies = k.getStackTraceElementProxyArray();
-            StackTraceElementProxy[] stackTraces = Arrays.copyOf(traceElementProxies, 3);
-            if (!autoRebuildCuckooFilter.mightContain(stackTraces)) {
-                autoRebuildCuckooFilter.put(stackTraces);
-                return false;
-            }
-            //如果 mightContain true ，则由于 抛出位置≠完整堆栈 & 布谷鸟过滤器的误判，再进行一次完整堆栈的布谷鸟过滤
-            return autoRebuildCuckooFilter.isFull(traceElementProxies);
-        }));
+        //如果 mightContain false 则直接判断为打印完整堆栈（return false）
+        return Boolean.TRUE.equals(RESULT_CACHE.get().get(throwableProxy, k -> autoRebuildCuckooFilter.isFull(k.getStackTraceElementProxyArray())));
     }
 
     @Override
     public boolean isShouldSkipLine(String line) {
         return stackLineSkipPredicate.isShouldSkipLine(line);
-    }
-
-    @SuppressWarnings({"unused", "UnstableApiUsage"})
-    private enum Funnels implements Funnel<StackTraceElementProxy[]> {
-        DEFAULT {
-            @Override
-            public void funnel(StackTraceElementProxy @NotNull [] from, @NotNull PrimitiveSink into) {
-                if (from.length == 0) {
-                    return;
-                }
-                StringBuilder builder = new StringBuilder();
-                for (StackTraceElementProxy stackTraceElementProxy : from) {
-                    builder.append(stackTraceElementProxy.getSTEAsString());
-                }
-                into.putString(builder.toString(), StandardCharsets.UTF_8);
-            }
-        }
     }
 
     private static class AutoRebuildCuckooFilter<T> {
@@ -125,23 +93,16 @@ public class CuckooThrowableDuplicateFilter implements StackLineSkipPredicate {
             this.rebuildingInterval = duration.toMillis() / this.maxRebuildingNum;
         }
 
-        public boolean put(T item) {
-            CuckooFilter<T> cuckooFilter = rebuildIfNecessary();
-            return cuckooFilter.put(item);
-        }
-
-        public boolean mightContain(T item) {
-            CuckooFilter<T> cuckooFilter = rebuildIfNecessary();
-            return cuckooFilter.mightContain(item);
-        }
-
         public boolean isFull(T item) {
             CuckooFilter<T> cuckooFilter = rebuildIfNecessary();
             int times = CUCKOO_MAX_COUNT;
             if (currentRebuildingNum.get() == maxRebuildingNum) {
                 times = lastBuildMaxCount;
             }
-            return !cuckooFilter.put(item) || cuckooFilter.approximateCount(item) >= times;
+            if (cuckooFilter.approximateCount(item) >= times) {
+                return true;
+            }
+            return !cuckooFilter.put(item);
         }
 
         private CuckooFilter<T> rebuildIfNecessary() {
@@ -158,5 +119,4 @@ public class CuckooThrowableDuplicateFilter implements StackLineSkipPredicate {
             return reference.get();
         }
     }
-
 }
